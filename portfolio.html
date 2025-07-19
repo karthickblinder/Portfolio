@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Karthick's Portfolio</title>
+    <link rel="icon" href="karthick-favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #0b1d3a;
+            --text-color: white;
+            --card-color: #12294e;
+            --accent: #00d1ff;
+            --nav-bg: #08172e;
+            --shadow-color: rgba(0, 0, 0, 0.2);
+            --nav-transparent: rgba(0, 0, 0, 0.3);
+            /* New colors for the energy effect */
+            --energy-ring-color: #00d1ff; /* Bright cyan/blue */
+            --energy-particle-color: rgba(255, 255, 255, 0.7); /* White for subtle particles */
+        }
+        body.dark-mode {
+            --bg-color: #f0f0f0;
+            --text-color: #111;
+            --card-color: #ffffff;
+            --accent: #0078a8;
+            --nav-bg: transparent;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --nav-transparent: transparent;
+            /* Dark mode adjustment for energy effect */
+            --energy-ring-color: #0078a8;
+            --energy-particle-color: rgba(0, 0, 0, 0.5);
+        }
+        * {
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Segoe UI',sans-serif;
+            line-height:1.5;
+        }
+        body {
+            background-color:var(--bg-color);
+            color:var(--text-color);
+            scroll-behavior:smooth;
+            transition:all 0.3s ease;
+        }
+        header {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:0.8rem 2rem;
+            background-color:var(--nav-bg);
+            position:fixed;
+            width:100%;
+            z-index:999;
+            transition:all 0.3s ease;
+        }
+        header.scrolled {
+            background-color: var(--nav-transparent);
+            box-shadow: 0 4px 10px var(--shadow-color);
+        }
+        header.scrolled nav a {
+            color: var(--text-color);
+        }
+
+        h2 {
+            color: var(--accent);
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        nav a {
+            color:var(--text-color);
+            margin-left:1.2rem;
+            text-decoration:none;
+            font-weight:bold;
+            transition:0.3s;
+            position:relative;
+        }
+        nav a:hover {
+            color:var(--accent);
+        }
+        nav a::after {
+            content:''; position:absolute;
+            width:0; height:2px;
+            bottom:-5px; left:0;
+            background-color:var(--accent);
+            transition:width 0.3s ease;
+        }
+        nav a:hover::after, nav a.active::after {
+            width:100%;
+        }
+        .download-btn {
+            padding:0.4rem 1rem;
+            background:var(--accent);
+            border-radius:20px;
+            color:var(--bg-color);
+            font-weight:bold;
+            text-decoration:none;
+            transition:all 0.3s;
+        }
+        .download-btn:hover {
+            transform:translateY(-3px);
+            box-shadow:0 5px 15px rgba(0,209,255,0.4);
+        }
+        .toggle-btn {
+            cursor:pointer;
+            background:none;
+            border:none;
+            color:var(--accent);
+            font-size:1.2rem;
+            margin-left:1rem;
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 1.8rem;
+            background: none;
+            color: var(--accent);
+            border: none;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        @media(max-width:768px){
+            .menu-toggle {
+                display: block;
+                position: absolute;
+                top: 1rem;
+                right: 1.5rem;
+            }
+            nav {
+                flex-direction: column;
+                align-items: flex-start;
+                position: absolute;
+                top: 60px;
+                right: 0;
+                background-color: var(--nav-bg);
+                width: 100%;
+                display: none;
+                padding: 1rem 2rem;
+                border-top: 1px solid rgba(255,255,255,0.1);
+            }
+            nav.show {
+                display: flex;
+            }
+            nav a {
+                margin: 0.5rem 0;
+            }
+        }
+
+        section {
+            padding:3rem 2rem;
+            scroll-margin-top:70px;
+        }
+        .home {
+            display:flex;
+            flex-direction:row;
+            align-items:center;
+            justify-content:space-around;
+            gap:3rem;
+            padding-top:5rem;
+            padding-bottom:2rem;
+            animation:fadeIn 2s ease-in;
+        }
+        .home-content {
+            max-width:600px;
+        }
+
+        /* Profile Picture and Energy Ring Effect */
+        .profile-pic-container {
+            position: relative;
+            width: 230px; /* Same as image width */
+            height: 230px; /* Same as image height */
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: visible; /* Changed to visible to allow full effect */
+            box-shadow: 0 0 15px var(--accent); /* Initial subtle glow */
+        }
+
+        .home img {
+            width:100%; /* Fill container */
+            height:100%; /* Fill container */
+            border-radius:50%; /* Ensures a perfect circle */
+            object-fit:cover; /* Prevents stretching if image isn't square */
+            border:4px solid var(--accent); /* Existing border */
+            z-index: 1; /* Place image above pseudo-element */
+        }
+
+        .profile-pic-container::before {
+            content: '';
+            position: absolute;
+            top: -20px; /* Adjust to control how far out the ring is */
+            left: -20px; /* Adjust to control how far out the ring is */
+            right: -20px; /* Adjust to control how far out the ring is */
+            bottom: -20px; /* Adjust to control how far out the ring is */
+            border-radius: 50%;
+            border: 3px solid var(--energy-ring-color); /* The ring itself */
+            box-shadow: 0 0 25px var(--energy-ring-color),
+                        0 0 50px var(--energy-ring-color),
+                        0 0 75px var(--energy-ring-color); /* Stronger glow */
+            animation: rotateGlow 8s infinite linear, pulseScale 2s infinite alternate ease-in-out;
+            z-index: 0; /* Place behind the image */
+        }
+
+        /* Optional: Adding more subtle particles or internal glow if desired, similar to the sample */
+        .profile-pic-container::after {
+            content: '';
+            position: absolute;
+            width: calc(100% + 10px); /* Slightly larger than image */
+            height: calc(100% + 10px); /* Slightly larger than image */
+            border-radius: 50%;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+            animation: fadeAndPulse 3s infinite alternate ease-in-out;
+            z-index: 0; /* Behind the image */
+        }
+
+
+        @keyframes rotateGlow {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulseScale {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.03); /* Subtle scale pulse */
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes fadeAndPulse {
+            0% {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+        }
+
+
+        .typing {
+            font-size:2rem;
+            font-weight:bold;
+            white-space:nowrap;
+            overflow:hidden;
+            border-right:3px solid var(--accent);
+            animation:typing 2.5s steps(22, end) forwards;
+            width:17ch;
+        }
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 17ch; }
+        }
+
+        .boxes, .skills-boxes, .exp-boxes {
+            display:flex;
+            flex-wrap:wrap;
+            gap:1.5rem;
+            justify-content:center;
+            animation:slideUp 1s ease-in;
+        }
+
+        .box {
+            background-color:var(--card-color);
+            padding:1.2rem;
+            border-radius:10px;
+            width:270px;
+            box-shadow:0 0 10px rgba(0,209,255,0.3);
+            transition:transform 0.3s;
+        }
+
+        .box:hover {
+            transform:translateY(-8px);
+        }
+
+        .exp-boxes .box p {
+            text-align:justify;
+        }
+
+        .contact-icons {
+            display:flex;
+            gap:1.5rem;
+            justify-content:center;
+            flex-wrap:wrap;
+            margin-top:1.5rem;
+        }
+
+        .icon {
+            width:60px;
+            height:60px;
+            border-radius:50%;
+            background-color:rgba(0,209,255,0.1);
+            border:2px solid var(--accent);
+            color:var(--accent);
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            font-size:1.6rem;
+            text-decoration:none;
+            transition:transform 0.3s;
+        }
+
+        .icon:hover {
+            transform:scale(1.2);
+            background-color:var(--accent);
+            color:var(--bg-color);
+        }
+
+        form {
+            max-width:500px;
+            margin:2rem auto;
+            background: rgba(255, 255, 255, 0.08); /* Semi-transparent for glassmorphism in dark mode */
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding:2.5rem;
+            border-radius:20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            position:relative;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transition: all 0.3s ease; /* Add transition for smooth mode change */
+        }
+
+        /* --- Dark Mode specific styles for form (making it non-glassmorphic) --- */
+        body.dark-mode form {
+            background: #ffffff; /* Solid white background */
+            backdrop-filter: none; /* Remove blur */
+            -webkit-backdrop-filter: none;
+            border: 1px solid #ddd; /* Softer border */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Softer shadow */
+        }
+
+        body.dark-mode form h3 {
+            color: var(--accent); /* Keep accent color for heading */
+            text-shadow: none; /* Remove text shadow */
+        }
+
+        body.dark-mode form input,
+        body.dark-mode form textarea {
+            background-color: #f7f7f7; /* Lighter input background */
+            border: 1px solid #ccc; /* Softer input border */
+            color: var(--text-color); /* Ensure text is readable */
+        }
+
+        body.dark-mode form input::placeholder,
+        body.dark-mode form textarea::placeholder {
+            color: #999; /* Adjust placeholder color for light mode */
+        }
+
+        body.dark-mode form input:focus,
+        body.dark-mode form textarea:focus {
+            outline: none;
+            border: 1px solid var(--accent); /* Keep accent border on focus */
+            box-shadow: 0 0 8px rgba(0, 120, 168, 0.2); /* Softer glow on focus */
+            background-color: #fff; /* White background on focus */
+        }
+
+        body.dark-mode form button {
+            background: var(--accent); /* Keep accent color for button */
+            color: white; /* Ensure text is white */
+            box-shadow: 0 3px 10px rgba(0, 120, 168, 0.2); /* Softer button shadow */
+        }
+        /* --- End Dark Mode specific styles for form --- */
+
+
+        form h3 {
+            text-align:center;
+            margin-bottom:1rem;
+            color:var(--accent);
+            text-shadow: 0 0 5px rgba(0,209,255,0.5); /* Subtle text shadow for pop */
+        }
+
+        form input,
+        form textarea {
+            width:100%;
+            padding:0.9rem; /* Increased padding for input fields */
+            border: 1px solid rgba(255, 255, 255, 0.4); /* Clearer input borders */
+            border-radius:10px; /* Slightly more rounded inputs */
+            font-size:1rem;
+            background-color:rgba(255,255,255,0.1); /* Lighter transparency for inputs */
+            color: var(--text-color);
+            transition:all 0.3s ease;
+        }
+
+        form input::placeholder,
+        form textarea::placeholder {
+            color: rgba(255,255,255,0.6); /* Adjusted placeholder color for better contrast */
+            opacity: 1; /* Ensures placeholder is not transparent */
+        }
+
+        form input:focus,
+        form textarea:focus {
+            outline:none; /* Remove default outline */
+            border: 1px solid var(--accent); /* Accent color border on focus */
+            box-shadow:0 0 15px rgba(0,209,255,0.5); /* Stronger glow on focus */
+            background-color:rgba(255,255,255,0.15); /* Slightly more opaque on focus */
+        }
+
+        form textarea {
+            resize:vertical;
+            min-height:120px; /* Increased min-height for textarea */
+        }
+
+        form button {
+            background:var(--accent);
+            color:var(--bg-color);
+            font-weight:bold;
+            padding:0.9rem; /* Increased padding for button */
+            border:none;
+            border-radius:10px; /* Rounded button */
+            cursor:pointer;
+            transition:all 0.3s ease;
+            width:100%;
+            font-size:1.1rem; /* Slightly larger font for button */
+            margin-top:1rem; /* More space above button */
+            box-shadow: 0 5px 15px rgba(0,209,255,0.3); /* Button shadow */
+        }
+
+        form button:hover {
+            background:#00a3cc;
+            transform:translateY(-3px); /* More pronounced lift on hover */
+            box-shadow:0 8px 20px rgba(0,209,255,0.5); /* Stronger shadow on hover */
+        }
+
+        @keyframes fadeIn {
+            from{opacity:0;transform:translateY(-20px);}
+            to{opacity:1;transform:translateY(0);}
+        }
+        @keyframes slideUp {
+            from{opacity:0;transform:translateY(20px);}
+            to{opacity:1;transform:translateY(0);}
+        }
+
+        @media(max-width:768px){
+            .home {
+                flex-direction:column;
+                text-align:center;
+                padding-top:5rem;
+            }
+            section {
+                padding:2.5rem 1.2rem;
+            }
+            form {
+                padding: 1.5rem; /* Adjust padding for smaller screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <header id="navbar">
+        <h2>Karthick</h2>
+        <button class="menu-toggle" onclick="toggleNav()"><i class="fas fa-bars"></i></button>
+        <nav id="navLinks">
+            <a href="#home">Home</a>
+            <a href="#education">Education</a>
+            <a href="#skills">Skills</a>
+            <a href="#experience">Experience</a>
+            <a href="#contact">Contact</a>
+            <a class="download-btn" href="Karthick.V's resume.pdf" download>Resume</a>
+            <button class="toggle-btn" onclick="toggleMode()"><i class="fas fa-moon"></i></button>
+        </nav>
+    </header>
+
+    <section id="home" class="home">
+        <div class="profile-pic-container">
+            <img src="profile.jpg" alt="Karthick V" />
+        </div>
+        <div class="home-content">
+            <div class="typing">Hi, I'm Karthick V</div>
+            <p>Final year Computer Science and Engineering student specializing in Data Science. Passionate about AI, game development, and impactful projects.</p>
+        </div>
+    </section>
+
+    <section id="education">
+        <h2>Education</h2>
+        <div class="boxes">
+            <div class="box"><h3>B.E Computer Science and Engineering With Specialization in Data Science</h3><p>Sathyabama Institute of Science and Technology, 2022–2026</p><p>CGPA: 8.32</p></div>
+            <div class="box"><h3>HSC</h3><p>SRV Matriculation Higher Secondary School, Samayapuram.</p><p>Batch: 2020–2022</p><p>Percentage: 79%</p></div>
+            <div class="box"><h3>SSLC</h3><p>Jack and Jill Matriculation School, Kabisthalam.</p><p>Batch: 2019–2020</p><p>Percentage: 64.6%</p></div>
+        </div>
+    </section>
+
+    <section id="skills">
+        <h2>Skills</h2>
+        <div class="skills-boxes">
+            <div class="box"><h3>Python</h3></div>
+            <div class="box"><h3>Machine Learning</h3></div>
+            <div class="box"><h3>Power BI</h3></div>
+            <div class="box"><h3>Excel</h3></div>
+            <div class="box"><h3>Unity</h3></div>
+            <div class="box"><h3>Data Analysis</h3></div>
+            <div class="box"><h3>SQL</h3></div>
+            <div class="box"><h3>Git</h3></div>
+            <div class="box"><h3>Linux</h3></div>
+            <div class="box"><h3>Basic Data Structures</h3></div>
+            <div class="box"><h3>GitHub</h3></div>
+            <div class="box"><h3>R Programming</h3></div>
+            <div class="box"><h3>HTML</h3></div>
+            <div class="box"><h3>CSS</h3></div>
+            <div class="box"><h3>JavaScript</h3></div>
+        </div>
+    </section>
+
+    <section id="experience">
+        <h2>Experience</h2>
+        <div class="exp-boxes">
+            <div class="box"><h3>Codsoft Internship</h3><p>Worked on 5 data science projects including fraud detection and movie rating prediction.</p></div>
+            <div class="box"><h3>Cognibot Program</h3><p>Completed a 45-hour ML training program with hands-on projects from July to October 2024.</p></div>
+            <div class="box"><h3>Power BI Workshop</h3><p>Attended a one-day Power BI workshop and created interactive dashboards.</p></div>
+            <div class="box"><h3>Excel Certification</h3><p>Completed one-month Excel program learning functions, charts, and analysis tools.</p></div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <h2>Contact Me</h2>
+        <div class="contact-icons">
+            <a class="icon" href="https://www.instagram.com/random_blinders/" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a class="icon" href="https://www.linkedin.com/in/karthick-v-2738592b4" target="_blank"><i class="fab fa-linkedin"></i></a>
+            <a class="icon" href="tel:+919345154377"><i class="fas fa-phone"></i></a>
+            <a class="icon" href="https://github.com/karthickblinder" target="_blank"><i class="fab fa-github"></i></a>
+        </div>
+        <form>
+            <h3>Send Message</h3>
+            <input type="text" placeholder="Your Name" required>
+            <input type="tel" placeholder="Your Phone Number" required>
+            <input type="email" placeholder="Your Email" required>
+            <textarea placeholder="Your Message" required></textarea>
+            <button type="submit">Send Message</button>
+        </form>
+    </section>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll("a[href^='#']").forEach(anchor => {
+                anchor.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute("href")).scrollIntoView({ behavior: "smooth" });
+                    if (window.innerWidth < 768) {
+                        document.getElementById("navLinks").classList.remove("show");
+                    }
+                });
+            });
+
+            const navbar = document.getElementById("navbar");
+            window.addEventListener("scroll", () => {
+                navbar.classList.toggle("scrolled", window.scrollY > 50);
+            });
+
+            const sections = document.querySelectorAll("section");
+            const navItems = document.querySelectorAll("nav a");
+            window.addEventListener("scroll", () => {
+                let current = "";
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= (sectionTop - 300)) {
+                        current = section.getAttribute("id");
+                    }
+                });
+                navItems.forEach(item => {
+                    item.classList.remove("active");
+                    if (item.getAttribute("href") === `#${current}`) {
+                        item.classList.add("active");
+                    }
+                });
+            });
+        });
+
+        function toggleMode() {
+            document.body.classList.toggle("dark-mode");
+            // Optional: Change the icon of the toggle button based on mode
+            const toggleBtnIcon = document.querySelector('.toggle-btn i');
+            if (document.body.classList.contains('dark-mode')) {
+                toggleBtnIcon.classList.remove('fa-moon');
+                toggleBtnIcon.classList.add('fa-sun');
+            } else {
+                toggleBtnIcon.classList.remove('fa-sun');
+                toggleBtnIcon.classList.add('fa-moon');
+            }
+        }
+
+        function toggleNav() {
+            document.getElementById("navLinks").classList.toggle("show");
+        }
+    </script>
+</body>
+</html>
